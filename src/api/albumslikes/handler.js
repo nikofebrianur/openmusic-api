@@ -6,6 +6,7 @@ class AlbumLikesHandler {
         this._albumService = albumService;
 
         this.postAlbumLikesHandler = this.postAlbumLikesHandler.bind(this);
+        this.deleteAlbumLikesHandler = this.deleteAlbumLikesHandler.bind(this);
         this.getAlbumLikesHandler = this.getAlbumLikesHandler.bind(this);
     }
 
@@ -29,14 +30,6 @@ class AlbumLikesHandler {
                 return response;
             }
 
-            await this._service.deleteAlbumLike(credentialId, albumId);
-
-            const response = h.response({
-                status: "success",
-                message: "Dislike berhasil",
-            });
-            response.code(201);
-            return response;
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({
@@ -57,6 +50,37 @@ class AlbumLikesHandler {
             return response;
         }
     }
+
+    async deleteAlbumLikesHandler(request, h) {
+        try {
+            const { albumId } = request.params;
+            const { id: credentialId } = request.auth.credentials;
+
+            await this._albumService.verifyAlbum(albumId, credentialId);
+
+            const getLiked = await this._service.verifyLikes(albumId, credentialId);
+
+            if(getLiked) {
+                await this._service.deleteAlbumLike(credentialId, albumId);
+    
+                const response = h.response({
+                    status: "success",
+                    message: "Dislike berhasil",
+                });
+                response.code(201);
+                return response;
+            }
+        } catch (error) {
+            if (error instanceof ClientError) {
+                const response = h.response({
+                    status: "fail",
+                    message: error.message,
+                });
+                response.code(error.statusCode);
+                return response;
+        }
+    }
+}
 
     async getAlbumLikesHandler(request, h) {
         try {
