@@ -8,6 +8,14 @@ const routes = (handler) => [
     },
   },
   {
+    method: "DELETE",
+    path: "/albums/{albumId}/likes",
+    handler: handler.deleteAlbumLikesHandler,
+    options: {
+      auth: "openmusicsapp_jwt",
+    },
+  },
+  {
     method: "GET",
     path: "/albums/{albumId}/likes",
     handler: handler.getAlbumLikesHandler,
